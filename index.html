@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unbeatable Tic-Tac-Toe AI | Game Theory Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <h1>TIC-TAC-TOE AI</h1>
+        </div>
+        <div class="subtitle">Search Algorithm & Game Theory Visualizer</div>
+    </header>
+
+    <main>
+        <!-- LEFT PANEL: Game Setup & Match Stats -->
+        <section class="left-panel flex-col gap-1">
+            <div class="glass-panel">
+                <h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                    </svg>
+                    Game Setup
+                </h2>
+                
+                <div class="control-group">
+                    <label for="game-mode">Game Mode</label>
+                    <div class="select-wrapper">
+                        <select id="game-mode">
+                            <option value="human-ai">Human vs AI</option>
+                            <option value="human-human">Human vs Human</option>
+                            <option value="ai-ai">AI vs AI (Demo)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group" id="difficulty-group">
+                    <label for="ai-difficulty">AI Difficulty</label>
+                    <div class="select-wrapper">
+                        <select id="ai-difficulty">
+                            <option value="unbeatable">Unbeatable (Full Minimax)</option>
+                            <option value="medium">Medium (Shallow Search)</option>
+                            <option value="easy">Easy (Random Moves)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group" id="side-group">
+                    <label>Play As</label>
+                    <div class="button-group">
+                        <button type="button" class="btn-toggle active x-theme" id="play-as-x">Player X (Goes 1st)</button>
+                        <button type="button" class="btn-toggle o-theme" id="play-as-o">Player O (AI 1st)</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>First Move</label>
+                    <div class="select-wrapper">
+                        <select id="first-move">
+                            <option value="player">Selected Player</option>
+                            <option value="ai">AI Opponent</option>
+                            <option value="random">Random Choose</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="margin-top: 1.5rem;">
+                <h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34M12 2a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4Z"/>
+                    </svg>
+                    Match Score
+                </h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">X Wins</span>
+                        <span class="stat-value accent-cyan" id="score-x">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">O Wins</span>
+                        <span class="stat-value accent-magenta" id="score-o">0</span>
+                    </div>
+                    <div class="stat-card" style="grid-column: span 2;">
+                        <span class="stat-label">Draws</span>
+                        <span class="stat-value" id="score-draws" style="color: var(--text-primary)">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTER PANEL: Game Board & Play Area -->
+        <section class="game-container">
+            <div class="glass-panel status-card turn-x" id="game-status-card">
+                <span class="status-indicator" id="game-status-indicator"></span>
+                <span id="game-status-text">Your Turn (X)</span>
+            </div>
+
+            <div class="board-wrapper pulse-glow">
+                <div class="board" id="board">
+                    <div class="cell" data-index="0" id="cell-0"></div>
+                    <div class="cell" data-index="1" id="cell-1"></div>
+                    <div class="cell" data-index="2" id="cell-2"></div>
+                    <div class="cell" data-index="3" id="cell-3"></div>
+                    <div class="cell" data-index="4" id="cell-4"></div>
+                    <div class="cell" data-index="5" id="cell-5"></div>
+                    <div class="cell" data-index="6" id="cell-6"></div>
+                    <div class="cell" data-index="7" id="cell-7"></div>
+                    <div class="cell" data-index="8" id="cell-8"></div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" id="btn-restart">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                    Restart Round
+                </button>
+                <button class="btn-secondary" id="btn-reset-scores">Reset Scores</button>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: Visualizer Metrics & Theory -->
+        <section class="info-section">
+            <div class="glass-panel">
+                <h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+                    </svg>
+                    Search Visualizer
+                </h2>
+
+                <div class="control-group">
+                    <div class="switch-container">
+                        <label for="toggle-evals" style="margin-bottom: 0; cursor: pointer;">Show Move Scores</label>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-evals" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="ai-algorithm">Search Algorithm</label>
+                    <div class="select-wrapper">
+                        <select id="ai-algorithm">
+                            <option value="minimax-pruning">Minimax + Alpha-Beta Pruning</option>
+                            <option value="minimax-standard">Standard Minimax (Full Tree)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="metrics-list">
+                    <div class="metric-item">
+                        <span class="metric-label">Nodes Evaluated:</span>
+                        <span class="metric-value accent-cyan" id="nodes-count">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Alpha-Beta Cuts (Prunes):</span>
+                        <span class="metric-value accent-magenta" id="prunes-count">0</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Search Time (ms):</span>
+                        <span class="metric-value" id="search-time" style="color: var(--accent-green)">0.00</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Max Call Depth:</span>
+                        <span class="metric-value" id="max-depth">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel info-card">
+                <h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/>
+                    </svg>
+                    Game Theory 101
+                </h2>
+                <div class="info-card">
+                    <h3>Minimax Search</h3>
+                    <p style="margin-bottom: 0.75rem;">
+                        Minimax is a decision rule used in game theory for two-player zero-sum games. It works by recursively searching the game tree. The maximizing player (AI) tries to get the highest score, while the minimizing player (Human) tries to force the lowest score.
+                    </p>
+                    <h3>Alpha-Beta Pruning</h3>
+                    <p style="margin-bottom: 0.75rem;">
+                        It is an optimization technique for Minimax. It maintains two values, <code>alpha</code> (maximum score guaranteed to maximizer) and <code>beta</code> (minimum score guaranteed to minimizer). If <code>alpha ≥ beta</code>, the rest of the branch is pruned, as the opponent can force a better outcome elsewhere.
+                    </p>
+                    <h3>Is AI Unbeatable?</h3>
+                    <p>
+                        Yes, at the "Unbeatable" level. Since Tic-Tac-Toe has only 9! = 362,880 possible games (and far fewer unique states, exactly 5,478 legal positions), the AI searches the entire tree in a fraction of a millisecond. Under optimal play by both sides, the game will always end in a <strong>Draw</strong>.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2026 Tic-Tac-Toe AI Agent. Developed with DeepMind Antigravity guidance.
+    </footer>
+
+    <!-- App Scripts -->
+    <script src="minimax.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
